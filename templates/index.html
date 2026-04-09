@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}NetGen AI — Upload Dataset{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>NetGen AI</h1>
+    <p class="hero-subtitle">Generate realistic synthetic network data using Claude AI</p>
+</section>
+
+<section class="card upload-card">
+    <h2>Upload Your Dataset</h2>
+    <p class="text-muted">Upload a CSV file to get started. The app will analyze the schema and let you generate new rows that match your data's patterns.</p>
+
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" id="upload-form">
+        <div class="upload-zone" id="drop-zone">
+            <div class="upload-icon">📁</div>
+            <p class="upload-text">Drag & drop your CSV file here</p>
+            <p class="text-muted">or</p>
+            <label class="btn btn-secondary" for="file-input">Browse Files</label>
+            <input type="file" name="file" id="file-input" accept=".csv" hidden>
+            <p class="file-name" id="file-name"></p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="upload-btn" disabled>
+            Upload & Analyze
+        </button>
+    </form>
+</section>
+
+<section class="features">
+    <div class="feature-grid">
+        <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <h3>Analyze</h3>
+            <p>Upload your CSV and instantly view schema, data types, and sample rows.</p>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🤖</div>
+            <h3>Generate</h3>
+            <p>Claude AI creates realistic synthetic rows matching your data patterns.</p>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">✅</div>
+            <h3>Validate & Export</h3>
+            <p>Preview generated data side-by-side, then download the augmented dataset.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

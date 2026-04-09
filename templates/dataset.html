@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}NetGen AI — {{ filename }}{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div class="card-header">
+        <h2>📄 {{ filename }}</h2>
+        <span class="badge">{{ info.shape[0] }} rows × {{ info.shape[1] }} columns</span>
+    </div>
+
+    <div class="schema-section">
+        <h3>Column Schema</h3>
+        <div class="schema-grid">
+            {% for col in info.columns %}
+            <div class="schema-item">
+                <span class="schema-col">{{ col }}</span>
+                <span class="schema-type">{{ info.dtypes[col] }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="row-num">#</th>
+                    {% for col in info.columns %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in pagination.records %}
+                <tr>
+                    <td class="row-num">{{ (pagination.page - 1) * pagination.per_page + loop.index }}</td>
+                    {% for col in info.columns %}
+                    <td>{{ row[col] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pagination.total_pages > 1 %}
+    <div class="pagination">
+        {% if pagination.page > 1 %}
+        <a href="{{ url_for('dataset', page=pagination.page - 1) }}" class="btn btn-sm">&laquo; Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ pagination.page }} of {{ pagination.total_pages }}</span>
+        {% if pagination.page < pagination.total_pages %}
+        <a href="{{ url_for('dataset', page=pagination.page + 1) }}" class="btn btn-sm">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+{% if request.args.get('saved') %}
+<section class="card card-success">
+    <h3>✅ Augmented Dataset Ready</h3>
+    <p>Your augmented dataset has been saved.</p>
+    <a href="{{ url_for('download', filename=request.args.get('saved')) }}" class="btn btn-primary">
+        ⬇ Download {{ request.args.get('saved') }}
+    </a>
+</section>
+{% endif %}
+
+<section class="card">
+    <h3>Generate Synthetic Rows</h3>
+    <p class="text-muted">Use Claude AI to generate new rows that match the patterns in your dataset.</p>
+    <form action="{{ url_for('generate') }}" method="post" id="generate-form">
+        <div class="generate-controls">
+            <div class="input-group">
+                <label for="num_rows">Number of rows:</label>
+                <input type="number" name="num_rows" id="num_rows" value="5" min="1" max="100" class="input-field">
+            </div>
+            <button type="submit" class="btn btn-primary" id="generate-btn">
+                <span class="btn-text">🤖 Generate Rows</span>
+                <span class="btn-loading" hidden>
+                    <span class="spinner"></span> Generating...
+                </span>
+            </button>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('generate-form').addEventListener('submit', function() {
+    const btn = document.getElementById('generate-btn');
+    btn.querySelector('.btn-text').hidden = true;
+    btn.querySelector('.btn-loading').hidden = false;
+    btn.disabled = true;
+});
+</script>
+{% endblock %}
