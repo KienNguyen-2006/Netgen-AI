@@ -94,7 +94,7 @@ def generate():
     schema_prompt = get_schema_prompt(df)
 
     try:
-        generated = generate_rows(schema_prompt, num_rows)
+        generated, model_used = generate_rows(schema_prompt, num_rows)
     except RuntimeError as exc:
         flash(str(exc), "error")
         return redirect(url_for("dataset"))
@@ -108,6 +108,7 @@ def generate():
         columns=info["columns"],
         sample_rows=info["sample"],
         generated_rows=generated,
+        model_used=model_used,
     )
 
 
