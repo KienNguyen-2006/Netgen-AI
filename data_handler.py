@@ -34,12 +34,25 @@ def get_dataset_info(df: pd.DataFrame) -> dict:
     }
 
 
+def _truncate_value(val, max_len=100):
+    """Truncate long string values to keep the prompt compact."""
+    s = str(val)
+    if len(s) > max_len:
+        return s[:max_len] + "..."
+    return s
+
+
 def get_schema_prompt(df: pd.DataFrame) -> str:
     """Build a compact schema + sample representation for the AI prompt."""
     schema_lines = [f"- {col}: {dtype}" for col, dtype in df.dtypes.items()]
     schema_text = "\n".join(schema_lines)
-    sample_json = df.head(5).to_json(orient="records", indent=2)
-    return f"Schema:\n{schema_text}\n\nSample rows:\n{sample_json}"
+
+    sample = df.head(3).copy()
+    for col in sample.columns:
+        sample[col] = sample[col].apply(lambda v: _truncate_value(v))
+
+    sample_json = sample.to_json(orient="records", indent=2)
+    return f"Schema:\n{schema_text}\n\nSample rows (values may be truncated):\n{sample_json}"
 
 
 def append_rows(original_path: str, new_rows: list[dict]) -> str:
