@@ -6,7 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!dropZone) return;
 
-    dropZone.addEventListener("click", () => fileInput.click());
+    dropZone.addEventListener("click", (e) => {
+        if (e.target.tagName === "LABEL" || e.target.closest("label")) return;
+        fileInput.click();
+    });
 
     fileInput.addEventListener("change", () => {
         if (fileInput.files.length > 0) {
