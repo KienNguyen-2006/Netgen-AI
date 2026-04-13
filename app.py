@@ -84,7 +84,7 @@ def generate():
 
     try:
         num_rows = int(request.form.get("num_rows", 5))
-        if num_rows < 1 or num_rows > 100:
+        if num_rows < 1 or num_rows > 10:
             raise ValueError
     except (TypeError, ValueError):
         flash("Please enter a valid number of rows (1–100).", "error")
@@ -141,6 +141,47 @@ def discard():
     session.pop("generated_rows", None)
     flash("Generated rows discarded.", "info")
     return redirect(url_for("dataset"))
+
+
+@app.route("/compare")
+def compare():
+    filepath = session.get("filepath")
+    output_path = session.get("output_path")
+
+    if not filepath or not os.path.exists(filepath):
+        flash("No dataset loaded. Please upload a CSV file first.", "error")
+        return redirect(url_for("index"))
+
+    if not output_path or not os.path.exists(output_path):
+        flash("No augmented dataset yet. Generate and confirm rows first.", "error")
+        return redirect(url_for("dataset"))
+
+    original_df = load_dataset(filepath)
+    augmented_df = load_dataset(output_path)
+
+    original_info = get_dataset_info(original_df)
+    augmented_info = get_dataset_info(augmented_df)
+
+    new_rows_count = len(augmented_df) - len(original_df)
+
+    original_page = request.args.get("orig_page", 1, type=int)
+    augmented_page = request.args.get("aug_page", 1, type=int)
+
+    original_pagination = paginate_df(original_df, original_page, per_page=10)
+    augmented_pagination = paginate_df(augmented_df, augmented_page, per_page=10)
+
+    output_filename = os.path.basename(output_path)
+
+    return render_template(
+        "compare.html",
+        filename=session.get("filename"),
+        output_filename=output_filename,
+        original_info=original_info,
+        augmented_info=augmented_info,
+        original_pagination=original_pagination,
+        augmented_pagination=augmented_pagination,
+        new_rows_count=new_rows_count,
+    )
 
 
 @app.route("/download/<filename>")
