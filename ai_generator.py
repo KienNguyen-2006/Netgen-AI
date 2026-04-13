@@ -11,15 +11,18 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 MODELS = [
     "nvidia/nemotron-3-super-120b-a12b:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "qwen/qwen3-coder:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "google/gemma-3-27b-it:free",
 ]
 
 SYSTEM_PROMPT = (
-    "You are a network data expert. Analyze the schema and sample rows from this "
-    "BGP network dataset. Generate {n} new realistic rows that follow the same "
-    "patterns, value ranges, and distributions. The generated rows must be coherent, "
-    "valid within the schema, and must NOT duplicate any existing entries. "
-    "Return ONLY a JSON array of objects where each key matches the column headers "
-    "exactly. Do not include any explanation or markdown."
+    "You are a network data expert. Generate {n} new realistic rows for this "
+    "BGP network dataset. Follow the same patterns, value ranges, and distributions. "
+    "Do NOT duplicate existing entries. "
+    "IMPORTANT: Output ONLY a valid JSON array. No thinking, no explanation, no markdown. "
+    "Start your response with [ and end with ]."
 )
 
 
@@ -47,7 +50,7 @@ def _call_api(api_key: str, model: str, system: str, user_content: str) -> dict:
         ],
     }
 
-    response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+    response = requests.post(API_URL, headers=headers, json=payload, timeout=60)
     data = response.json()
 
     if not response.ok or "error" in data:
@@ -75,7 +78,7 @@ def generate_rows(schema_prompt: str, num_rows: int, retry: bool = True):
             last_error = exc
             print(f"[NetGen AI] {model} failed: {exc}")
             if i < len(MODELS) - 1:
-                time.sleep(2)
+                time.sleep(0.5)
             continue
     else:
         raise RuntimeError(

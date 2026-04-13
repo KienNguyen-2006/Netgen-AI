@@ -552,6 +552,69 @@ body {
     color: var(--color-text-muted);
 }
 
+/* Compare Page */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.stat-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.stat-card-success {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-border);
+}
+
+.stat-card-info {
+    background: var(--color-info-bg);
+    border-color: #bfdbfe;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.stat-card-success .stat-value {
+    color: var(--color-success);
+}
+
+.stat-card-info .stat-value {
+    color: var(--color-info);
+}
+
+.compare-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+.new-row {
+    background: #dcfce7 !important;
+}
+
+.new-row:hover {
+    background: #bbf7d0 !important;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
     .hero h1 {

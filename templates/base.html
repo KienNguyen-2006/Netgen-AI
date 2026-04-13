@@ -17,6 +17,9 @@
                 {% if session.get('filepath') %}
                 <a href="{{ url_for('dataset') }}">Dataset</a>
                 {% endif %}
+                {% if session.get('output_path') %}
+                <a href="{{ url_for('compare') }}">Compare</a>
+                {% endif %}
             </div>
         </div>
     </nav>
