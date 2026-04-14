@@ -16,6 +16,7 @@ from ai_generator import generate_rows
 from data_handler import (
     allowed_file,
     append_rows,
+    compare_datasets,
     get_dataset_info,
     get_schema_prompt,
     load_dataset,
@@ -163,14 +164,16 @@ def compare():
     augmented_info = get_dataset_info(augmented_df)
 
     new_rows_count = len(augmented_df) - len(original_df)
+    generated_df = augmented_df.iloc[len(original_df):]
 
     original_page = request.args.get("orig_page", 1, type=int)
     augmented_page = request.args.get("aug_page", 1, type=int)
 
-    original_pagination = paginate_df(original_df, original_page, per_page=10)
-    augmented_pagination = paginate_df(augmented_df, augmented_page, per_page=10)
+    original_pagination = paginate_df(original_df, original_page)
+    augmented_pagination = paginate_df(augmented_df, augmented_page)
 
     output_filename = os.path.basename(output_path)
+    comparison = compare_datasets(original_df, generated_df)
 
     return render_template(
         "compare.html",
@@ -181,6 +184,7 @@ def compare():
         original_pagination=original_pagination,
         augmented_pagination=augmented_pagination,
         new_rows_count=new_rows_count,
+        comparison=comparison,
     )
 
 

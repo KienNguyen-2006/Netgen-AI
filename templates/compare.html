@@ -27,92 +27,126 @@
     </div>
 </section>
 
-<div class="compare-grid">
-    <section class="card">
-        <div class="card-header">
-            <h3>📄 Original: {{ filename }}</h3>
-            <span class="badge">{{ original_info.shape[0] }} rows</span>
-        </div>
+<section class="card">
+    <div class="card-header">
+        <h3>📄 Original: {{ filename }}</h3>
+        <span class="badge">{{ original_info.shape[0] }} rows</span>
+    </div>
 
-        <div class="table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th class="row-num">#</th>
-                        {% for col in original_info.columns %}
-                        <th>{{ col }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in original_pagination.records %}
-                    <tr>
-                        <td class="row-num">{{ (original_pagination.page - 1) * original_pagination.per_page + loop.index }}</td>
-                        {% for col in original_info.columns %}
-                        <td>{{ row[col] }}</td>
-                        {% endfor %}
-                    </tr>
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="row-num">#</th>
+                    {% for col in original_info.columns %}
+                    <th>{{ col }}</th>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% if original_pagination.total_pages > 1 %}
-        <div class="pagination">
-            {% if original_pagination.page > 1 %}
-            <a href="{{ url_for('compare', orig_page=original_pagination.page - 1, aug_page=augmented_pagination.page) }}" class="btn btn-sm">&laquo; Prev</a>
-            {% endif %}
-            <span class="page-info">Page {{ original_pagination.page }} of {{ original_pagination.total_pages }}</span>
-            {% if original_pagination.page < original_pagination.total_pages %}
-            <a href="{{ url_for('compare', orig_page=original_pagination.page + 1, aug_page=augmented_pagination.page) }}" class="btn btn-sm">Next &raquo;</a>
-            {% endif %}
-        </div>
-        {% endif %}
-    </section>
-
-    <section class="card card-generated">
-        <div class="card-header">
-            <h3>✅ Augmented: {{ output_filename }}</h3>
-            <span class="badge badge-info">{{ augmented_info.shape[0] }} rows</span>
-        </div>
-
-        <div class="table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th class="row-num">#</th>
-                        {% for col in augmented_info.columns %}
-                        <th>{{ col }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in augmented_pagination.records %}
-                    {% set row_num = (augmented_pagination.page - 1) * augmented_pagination.per_page + loop.index %}
-                    <tr class="{{ 'new-row' if row_num > original_info.shape[0] }}">
-                        <td class="row-num">{{ row_num }}</td>
-                        {% for col in augmented_info.columns %}
-                        <td>{{ row[col] }}</td>
-                        {% endfor %}
-                    </tr>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in original_pagination.records %}
+                <tr>
+                    <td class="row-num">{{ (original_pagination.page - 1) * original_pagination.per_page + loop.index }}</td>
+                    {% for col in original_info.columns %}
+                    <td>{{ row[col] }}</td>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-        {% if augmented_pagination.total_pages > 1 %}
-        <div class="pagination">
-            {% if augmented_pagination.page > 1 %}
-            <a href="{{ url_for('compare', aug_page=augmented_pagination.page - 1, orig_page=original_pagination.page) }}" class="btn btn-sm">&laquo; Prev</a>
-            {% endif %}
-            <span class="page-info">Page {{ augmented_pagination.page }} of {{ augmented_pagination.total_pages }}</span>
-            {% if augmented_pagination.page < augmented_pagination.total_pages %}
-            <a href="{{ url_for('compare', aug_page=augmented_pagination.page + 1, orig_page=original_pagination.page) }}" class="btn btn-sm">Next &raquo;</a>
-            {% endif %}
-        </div>
+    {% if original_pagination.total_pages > 1 %}
+    <div class="pagination">
+        {% if original_pagination.page > 1 %}
+        <a href="{{ url_for('compare', orig_page=original_pagination.page - 1, aug_page=augmented_pagination.page) }}" class="btn btn-sm">&laquo; Prev</a>
         {% endif %}
-    </section>
-</div>
+        <span class="page-info">Page {{ original_pagination.page }} of {{ original_pagination.total_pages }}</span>
+        {% if original_pagination.page < original_pagination.total_pages %}
+        <a href="{{ url_for('compare', orig_page=original_pagination.page + 1, aug_page=augmented_pagination.page) }}" class="btn btn-sm">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<section class="card card-generated">
+    <div class="card-header">
+        <h3>✅ Augmented: {{ output_filename }}</h3>
+        <span class="badge badge-info">{{ augmented_info.shape[0] }} rows</span>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="row-num">#</th>
+                    {% for col in augmented_info.columns %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in augmented_pagination.records %}
+                {% set row_num = (augmented_pagination.page - 1) * augmented_pagination.per_page + loop.index %}
+                <tr class="{{ 'new-row' if row_num > original_info.shape[0] }}">
+                    <td class="row-num">{{ row_num }}</td>
+                    {% for col in augmented_info.columns %}
+                    <td>{{ row[col] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if augmented_pagination.total_pages > 1 %}
+    <div class="pagination">
+        {% if augmented_pagination.page > 1 %}
+        <a href="{{ url_for('compare', aug_page=augmented_pagination.page - 1, orig_page=original_pagination.page) }}" class="btn btn-sm">&laquo; Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ augmented_pagination.page }} of {{ augmented_pagination.total_pages }}</span>
+        {% if augmented_pagination.page < augmented_pagination.total_pages %}
+        <a href="{{ url_for('compare', aug_page=augmented_pagination.page + 1, orig_page=original_pagination.page) }}" class="btn btn-sm">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+{% if comparison and comparison.rows %}
+<section class="card" id="stat-comparison">
+    <div class="card-header">
+        <h2>📊 Data Quality Check</h2>
+        <span class="badge {% if 'good' in comparison.summary %}badge-ok{% else %}badge-warn{% endif %}">
+            {{ comparison.summary }}
+        </span>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table stats-table">
+            <thead>
+                <tr>
+                    <th>Column</th>
+                    <th>Original</th>
+                    <th>Generated</th>
+                    <th>Difference</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in comparison.rows %}
+                <tr>
+                    <td class="col-name">{{ r.column }}</td>
+                    <td>{{ r.original }}</td>
+                    <td>{{ r.generated }}</td>
+                    <td class="{% if r.diff > 30 %}stat-danger{% elif r.diff > 10 %}stat-warn{% else %}stat-ok{% endif %}">
+                        {{ r.diff }}%
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
 
 <section class="card">
     <div class="preview-actions">
