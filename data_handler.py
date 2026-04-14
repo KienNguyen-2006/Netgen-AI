@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
@@ -87,3 +89,58 @@ def paginate_df(df: pd.DataFrame, page: int, per_page: int = 25) -> dict:
         "total": total,
         "total_pages": total_pages,
     }
+
+
+def compare_datasets(original_df: pd.DataFrame, generated_df: pd.DataFrame,
+                     max_columns: int = 5) -> dict:
+    """Simplified comparison of original vs generated rows.
+
+    Picks the top numeric columns with the most variation, computes a
+    representative value for each, and returns an easy-to-read result.
+    """
+    if generated_df.empty:
+        return {"rows": [], "summary": "No generated rows to compare."}
+
+    orig_numeric = original_df.select_dtypes(include="number")
+    gen_numeric = generated_df.select_dtypes(include="number")
+    common = list(set(orig_numeric.columns) & set(gen_numeric.columns))
+
+    # Pick columns with actual variation, sorted by std descending
+    ranked = sorted(
+        [c for c in common if orig_numeric[c].std() > 1e-9],
+        key=lambda c: orig_numeric[c].std(),
+        reverse=True,
+    )
+    selected = ranked[:max_columns]
+
+    rows = []
+    bad = 0
+    for col in selected:
+        o_val = orig_numeric[col].mean()
+        g_val = gen_numeric[col].mean()
+
+        if o_val is None or g_val is None or not np.isfinite(o_val) or not np.isfinite(g_val):
+            continue
+
+        diff = round(abs(g_val - o_val) / (abs(o_val) + 1e-6) * 100, 2)
+        if diff > 30:
+            bad += 1
+
+        rows.append({
+            "column": col,
+            "original": round(o_val, 4),
+            "generated": round(g_val, 4),
+            "diff": diff,
+        })
+
+    total = len(rows)
+    if total == 0:
+        summary = "No comparable columns found."
+    elif bad == 0:
+        summary = "Generated data looks good — values are close to the original."
+    elif bad <= total // 2:
+        summary = f"Mostly good — {bad} of {total} columns differ by more than 30%."
+    else:
+        summary = f"Some values differ significantly — {bad} of {total} columns are off by more than 30%."
+
+    return {"rows": rows, "summary": summary}
